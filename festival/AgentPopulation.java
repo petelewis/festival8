@@ -1,6 +1,6 @@
 package festival;
 
-import java.util.ArrayDeque;
+import java.util.*;
 
 import sim.field.continuous.*;
 import sim.util.*;
@@ -11,7 +11,7 @@ import sim.engine.*;
  * Can generate new ones and keep track of those so far.
  * @author pete
  */
-public class AgentPopulation extends ArrayDeque implements Steppable {
+public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppable {
 
     private Continuous2D environment;
     private Schedule schedule;
@@ -64,7 +64,7 @@ public class AgentPopulation extends ArrayDeque implements Steppable {
         loc = new Double2D(STARTX, STARTY);
 
         // Go ahead and generate it
-        agent = new FestivalAgent(loc, FestivalAgent.AGENT, count, environment);
+        agent = new FestivalAgent(loc, FestivalAgent.AGENT, count, environment, this);
         count++;
 
         // If the location is acceptable, place it in the environment
