@@ -14,8 +14,9 @@ import java.awt.*;
 
 public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable {
 
-    //public String id;
     public int id = -1;
+    protected Color agentColor = new Color(0, 0, 0);
+    public Double2D agentLocation = null;
     public boolean inEnvironment = false;
     private Continuous2D environment;
 
@@ -28,6 +29,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
         id = i;
     }
+
     Double2D desiredLocation = null;
     Double2D suggestedLocation = null;
     int steps = 0;
@@ -76,6 +78,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             double dx = desiredLocation.x - location.x;
             double dy = desiredLocation.y - location.y;
 
+            // make a small step
             dx *= 0.01;
             dy *= 0.01;
 
@@ -102,15 +105,8 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         return agentState;
     }
 
-// not public so it doesn't appear in the inspector -- if a user changed it in the
-// inspector, various exceptions would occur.
     void setState(final int agentState) {
-
         // set the oval's color
         paint = agentColor;
     }
-    protected Color agentColor = new Color(0, 0, 0);
-//    protected Color targetColor = new Color(255, 0, 0);
-    // for Object2D
-    public Double2D agentLocation = null;
 }
