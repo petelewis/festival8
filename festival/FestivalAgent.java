@@ -39,10 +39,11 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     public Double2D getGoalPosition() {
 
         // Explore!
-        if (id % 2 == 0)
+        if (id % 2 == 0) {
             return new Double2D(600, 300);
-        else
+        } else {
             return new Double2D(300, 600);
+        }
     }
 
     /**
@@ -62,60 +63,24 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         if (inEnvironment) {
             // Get the agent's goal location
             //suggestedLocation = hb.kMeansEngine.getGoalPosition(intID);
-            suggestedLocation = getGoalPosition();
+            desiredLocation = getGoalPosition();
 
-            // Update the agent's direction
-            if (suggestedLocation != null) {
-                desiredLocation = suggestedLocation;
-            } else {
-                steps--;
-
-                // Change my goal when I'm done with my steps towards the previous one
-                if (steps <= 0) {
-                    desiredLocation = new Double2D(state.random.nextDouble() * (FestivalNoUI.XMAX - FestivalNoUI.XMIN - FestivalNoUI.DIAMETER) + FestivalNoUI.XMIN + FestivalNoUI.DIAMETER / 2,
-                            state.random.nextDouble() * (FestivalNoUI.YMAX - FestivalNoUI.YMIN - FestivalNoUI.DIAMETER) + FestivalNoUI.YMIN + FestivalNoUI.DIAMETER / 2);
-
-                    // How many steps should I go before changing my goal?
-                    // TODO: Make this to do with happiness instead?
-                    steps = 100;
-                }
-            }
-
+//            if (id == 0) {
+//                System.out.println("Current Position: "+location.x+","+location.y+", Desired Position: "+desiredLocation.x+","+desiredLocation.y);
+//            }
 
             // Calculate the next move towards the goal.
 
             // Difference between where I am and where I want to be
+            // dx and dy become my next step
             double dx = desiredLocation.x - location.x;
             double dy = desiredLocation.y - location.y;
 
-            if (dx > 0.5) {
-                dx = 0.5;
-            } else if (dx <
-                    -0.5) {
-                dx = -0.5;
-            }
-            if (dy > 0.5) {
-                dy = 0.5;
-            } else if (dy <
-                    -0.5) {
-                dy = -0.5;
-            }
-            if (dx <
-                    0.5 && dx > -0.5 && dy <
-                    0.5 && dy > -0.5) {
-                steps = 0;
-            }
-
-            dx *= 2.0;
-            dy *= 2.0;
-
-
-            // dx and dy become my next step
+            dx *= 0.01;
+            dy *= 0.01;
 
             // Actually move the agent, if it's a position it can occupy, otherwise stay still.
-            if (!hb.acceptablePosition(this, new Double2D(location.x + dx, location.y + dy))) {
-                steps = 0;
-            } else {
+            if (hb.acceptablePosition(this, new Double2D(location.x + dx, location.y + dy))) {
                 agentLocation = new Double2D(location.x + dx, location.y + dy);
                 hb.environment.setObjectLocation(this, agentLocation);
             }

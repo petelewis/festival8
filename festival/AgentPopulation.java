@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package festival;
 
 import java.util.ArrayDeque;
@@ -24,6 +20,9 @@ public class AgentPopulation extends ArrayDeque implements Steppable {
     private static final double STARTX = 10.0;
     private static final double STARTY = 10.0;
 
+    private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 2;
+    private static int timeBetweenAgents = 0;
+
     // Count the number of agents generated, to give agents an ID number
     private static int count = 0;
 
@@ -39,9 +38,16 @@ public class AgentPopulation extends ArrayDeque implements Steppable {
     }
 
     public void step(SimState state) {
-        // TODO: Randomness.
-        if (Math.random() < 0.01)
+
+        timeBetweenAgents++;
+
+        if ((Math.random() < 0.01) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
             generateNew();
+            timeBetweenAgents = 0;
+        }
+
+
+            
     }
 
     /**

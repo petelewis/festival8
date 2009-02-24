@@ -29,8 +29,8 @@ public class FestivalNoUI extends SimState {
     public AgentPopulation agentPopulation;
 
 
-    Double2D[] agentPos;
-    Double2D[] targetPos;
+//    Double2D[] agentPos;
+//    Double2D[] targetPos;
     public Continuous2D environment = null;
     
 
