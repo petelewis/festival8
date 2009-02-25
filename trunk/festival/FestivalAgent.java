@@ -13,9 +13,9 @@ import sim.field.continuous.*;
 import java.awt.*;
 
 public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable, Obstacle {
+    // Move this into the environment
 
-    public static double HORIZON = 42.0;
-
+    private static boolean stageSwitched = false;
     // The agent's ID
     public int id = -1;
 
@@ -35,10 +35,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private AgentPopulation agents;
 
     // Constants for social forces
-    private static final double AP = 2.0;
-    private static final double BP = 0.1;
-    private static final double AA = 0.5;
-    private static final double BA = 3.0;
+    private static final double AP = 6.0;
+    private static final double BP = 0.3;
+    private static final double AA = 1.5;
+    private static final double BA = 9.0;
     private static final double DISTANCE_SCALE = 10.0;
     private static final double TIMESTEP = 0.1;
     private static final double ACCELERATION = 3.0;
@@ -49,6 +49,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
     // The agent's properties / state
     private int preferredStage;
+    public static double HORIZON = 42.0;
 
     /**
      * The agent's constuctor
@@ -60,7 +61,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
      */
     public FestivalAgent(final Double2D location, final int state, int i, Continuous2D env, AgentPopulation a) {
         super(FestivalNoUI.DIAMETER);
-        System.out.println("New agent created with id " + i);
+        //System.out.println("New agent created with id " + i);
 
 
         this.agentLocation = location;
@@ -74,10 +75,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         // Half the agents prefer each stage
         if (Math.random() < 0.5) {
             preferredStage = 1;
-            agentColor = new Color(255, 255, 255);
+
         } else {
             preferredStage = 2;
-            agentColor = new Color(0, 0, 0);
+
         }
 
     }
@@ -94,11 +95,24 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
      * @return
      */
     public Double2D getGoalPosition() {
+        if (!stageSwitched) {
+            if (preferredStage == 1) {
+                agentColor = new Color(255, 255, 255);
+                return new Double2D(800, 400);
 
-        if (preferredStage == 1) {
-            return new Double2D(800, 400);
+            } else {
+                agentColor = new Color(0, 0, 0);
+                return new Double2D(10, 400);
+            }
         } else {
-            return new Double2D(10, 400);
+            if (preferredStage == 2) {
+                agentColor = new Color(255, 255, 255);
+                return new Double2D(800, 400);
+
+            } else {
+                agentColor = new Color(0, 0, 0);
+                return new Double2D(10, 400);
+            }
         }
     }
 
@@ -115,7 +129,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
         Double2D location = agentLocation;//hb.environment.getObjectLocation(this);
 
-
+        // Randomly every now and then switch stages - this should go in the stage / environment class
+        if (Math.random() < 0.00001) {
+            stageSwitched = !stageSwitched;
+        }
 
         if (inEnvironment) {
             // Get the agent's goal location
@@ -159,7 +176,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             double sy = 0.0;
 
             Bag obstacles = environment.getObjectsWithinDistance(this.getLocation(), HORIZON);
-            
+
             // iterate through other agents, determining social forces
             for (Object o : obstacles) {
                 Obstacle a = (Obstacle) o;
