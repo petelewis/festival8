@@ -65,7 +65,7 @@ public class FestivalWithUI extends GUIState {
         super.init(c);
 
         // make the displayer
-        display = new Display2D(600, 600, this, 1);
+        display = new Display2D(800, 800, this, 1);
 
         displayFrame = display.createFrame();
         displayFrame.setTitle("Festival");
