@@ -24,6 +24,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private static final double BP = 0.1;
     private static final double AA = 0.5;
     private static final double BA = 3.0;
+    private static final double DISTANCE_SCALE = 10.0;
+    private static final double TIMESTEP = 0.1;
+    private static final double ACCELERATION = 3.0;
+    private static final double DESIRED_VELOCITY = 600.0;
     private double lastDX = 0.0;
     private double lastDY = 0.0;
 
@@ -52,7 +56,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         if (id % 2 == 0) {
             return new Double2D(600, 300);
         } else {
-            return new Double2D(300, 600);
+            return new Double2D(10, 300);
         }
     }
 
@@ -85,19 +89,29 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             // dx and dy become my next step
             double dx = desiredLocation.x - location.x;
             double dy = desiredLocation.y - location.y;
-            double timestep = 0.1;
-            double acceleration = 3.0;
-            double desiredVelocity = 2.0;
 
-            dx *= desiredVelocity;
-            dy *= desiredVelocity;
+            // Normalise vector **
+            double normalisation = Math.pow(dx, 2.0) + Math.pow(dy, 2.0);
+            if (normalisation > 0) {
+                normalisation = Math.sqrt(normalisation);
+                dx /= normalisation;
+                dy /= normalisation;
+            }
 
-            dx -= (lastDX / timestep);
-            dy -= (lastDY / timestep);
 
 
-            dx /= acceleration;
-            dy /= acceleration;
+            dx /= DISTANCE_SCALE;
+            dy /= DISTANCE_SCALE;
+
+            dx *= DESIRED_VELOCITY;
+            dy *= DESIRED_VELOCITY;
+
+            dx -= (lastDX / TIMESTEP);
+            dy -= (lastDY / TIMESTEP);
+
+
+            dx /= ACCELERATION;
+            dy /= ACCELERATION;
 
 
             double sx = 0.0;
@@ -106,11 +120,13 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
             for (FestivalAgent a : agents) {
                 if ((a.inEnvironment) && (!a.equals(this))) {
-                    double displacementX = a.agentLocation.x - agentLocation.getX();
-                    double displacementY = a.agentLocation.y - agentLocation.getY();
+                    double displacementX = agentLocation.x - a.agentLocation.getX();
+                    double displacementY = agentLocation.y - a.agentLocation.getY();
+
+                    displacementX /= DISTANCE_SCALE;
+                    displacementY /= DISTANCE_SCALE;
 
                     double displacement = Math.sqrt(Math.pow(displacementX, 2.0) + Math.pow(displacementY, 2.0));
-                    displacement /= 100;
 
                     double forceX = (AP * displacementX / displacement) * Math.exp(-displacement / BP);
                     forceX += (AA * displacementX / displacement) * Math.exp(-displacement / BA);
@@ -129,15 +145,16 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             dy += sy;
 
 
-            //System.out.println("dx = " + dx + ", dy = " + dy + "     sx = "+sx + ", sy = " + sy);
             // add noise
+            dx += (Math.random() * 2.0 - 1.0) * 10.0;
+            dy += (Math.random() * 2.0 - 1.0) * 10.0;
 
 
-            dx *= timestep;
-            dy *= timestep;
+            dx *= TIMESTEP;
+            dy *= TIMESTEP;
 
 
-            
+
 
             //System.out.println(dx + ", " + dy);
 
