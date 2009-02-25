@@ -12,7 +12,10 @@ import sim.engine.*;
 import sim.field.continuous.*;
 import java.awt.*;
 
-public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable {
+
+public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable, Obstacle {
+
+	public static double HORIZON = 42.0;
 
     public int id = -1;
     protected Color agentColor = new Color(0, 0, 0);
@@ -30,6 +33,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private static final double DESIRED_VELOCITY = 600.0;
     private double lastDX = 0.0;
     private double lastDY = 0.0;
+
+    public Double2D getLocation(){
+    	return this.agentLocation;	
+    }
 
     public FestivalAgent(final Double2D location, final int state, int i, Continuous2D env, AgentPopulation a) {
         super(FestivalNoUI.DIAMETER);
@@ -118,10 +125,12 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             double sy = 0.0;
             // iterate through other agents, determining social forces
 
-            for (FestivalAgent a : agents) {
+			Bag obstacles = environment.getObjectsWithinDistance(this.getLocation(), HORIZON);
+			
+            for (Obstacle a : obstacles) {
                 if ((a.inEnvironment) && (!a.equals(this))) {
-                    double displacementX = agentLocation.x - a.agentLocation.getX();
-                    double displacementY = agentLocation.y - a.agentLocation.getY();
+                    double displacementX = this.getLocation().getX() - a.getLocation().getX();
+                    double displacementY = this.getLocation().getY() - a.getLocation().getY();
 
                     displacementX /= DISTANCE_SCALE;
                     displacementY /= DISTANCE_SCALE;
