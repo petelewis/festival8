@@ -17,7 +17,7 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     private Schedule schedule;
     private FestivalNoUI sim;
     
-    private static final double STARTX = 10.0;
+    private static final double STARTX = 300.0;
     private static final double STARTY = 10.0;
 
     private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 2;
