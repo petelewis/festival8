@@ -13,7 +13,7 @@ import sim.field.continuous.*;
 import java.awt.*;
 
 
-public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable, Obstacle {
+public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable, Locateable {
 
 	public static double HORIZON = 42.0;
 
@@ -127,7 +127,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
 			Bag obstacles = environment.getObjectsWithinDistance(this.getLocation(), HORIZON);
 			
-            for (Obstacle a : obstacles) {
+            for (Locateable a : obstacles) {
                 if ((a.inEnvironment) && (!a.equals(this))) {
                     double displacementX = this.getLocation().getX() - a.getLocation().getX();
                     double displacementY = this.getLocation().getY() - a.getLocation().getY();
