@@ -41,7 +41,7 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
 
         timeBetweenAgents++;
 
-        if ((Math.random() < 0.01) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
+        if ((Math.random() < 0.05) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
             generateNew();
             timeBetweenAgents = 0;
         }

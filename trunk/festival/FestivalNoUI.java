@@ -13,11 +13,10 @@ import sim.util.*;
 
 public class FestivalNoUI extends SimState {
 
-    // Dimensions of environment - 600??
     public static final double XMIN = 0;
-    public static final double XMAX = 600;
+    public static final double XMAX = 800;
     public static final double YMIN = 0;
-    public static final double YMAX = 600;
+    public static final double YMAX = 800;
 
     // Diameter of the agents in the environment
     public static final double DIAMETER = 8;

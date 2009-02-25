@@ -12,17 +12,29 @@ import sim.engine.*;
 import sim.field.continuous.*;
 import java.awt.*;
 
+public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable, Obstacle {
 
-public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implements Steppable, Locateable {
+    public static double HORIZON = 42.0;
 
-	public static double HORIZON = 42.0;
-
+    // The agent's ID
     public int id = -1;
-    protected Color agentColor = new Color(0, 0, 0);
+
+    // The agent's color
+    private Color agentColor;
+
+    // The agent's present location
     public Double2D agentLocation = null;
+
+    // Is the agent currently in the environment
     public boolean inEnvironment = false;
+
+    // The environment the agent is situated within
     private Continuous2D environment;
+
+    // The population of which the agent is a member
     private AgentPopulation agents;
+
+    // Constants for social forces
     private static final double AP = 2.0;
     private static final double BP = 0.1;
     private static final double AA = 0.5;
@@ -30,16 +42,26 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private static final double DISTANCE_SCALE = 10.0;
     private static final double TIMESTEP = 0.1;
     private static final double ACCELERATION = 3.0;
-    private static final double DESIRED_VELOCITY = 600.0;
+    private static final double DESIRED_VELOCITY = 800.0;
+    private static final double NOISE = 20.0;
     private double lastDX = 0.0;
     private double lastDY = 0.0;
 
-    public Double2D getLocation(){
-    	return this.agentLocation;	
-    }
+    // The agent's properties / state
+    private int preferredStage;
 
+    /**
+     * The agent's constuctor
+     * @param location
+     * @param state
+     * @param i
+     * @param env
+     * @param a
+     */
     public FestivalAgent(final Double2D location, final int state, int i, Continuous2D env, AgentPopulation a) {
         super(FestivalNoUI.DIAMETER);
+        System.out.println("New agent created with id " + i);
+
 
         this.agentLocation = location;
 
@@ -48,10 +70,24 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         agents = a;
 
         id = i;
+
+        // Half the agents prefer each stage
+        if (Math.random() < 0.5) {
+            preferredStage = 1;
+            agentColor = new Color(255, 255, 255);
+        } else {
+            preferredStage = 2;
+            agentColor = new Color(0, 0, 0);
+        }
+
     }
     Double2D desiredLocation = null;
     Double2D suggestedLocation = null;
     int steps = 0;
+
+    public Double2D getLocation() {
+        return this.agentLocation;
+    }
 
     /**
      * Calculate the agent's goal position
@@ -59,11 +95,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
      */
     public Double2D getGoalPosition() {
 
-        // Explore!
-        if (id % 2 == 0) {
-            return new Double2D(600, 300);
+        if (preferredStage == 1) {
+            return new Double2D(800, 400);
         } else {
-            return new Double2D(10, 300);
+            return new Double2D(10, 400);
         }
     }
 
@@ -73,7 +108,8 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
      */
     public void step(final SimState state) {
 
-        //System.out.println("Agent " + id + " stepping.");
+//        System.out.println("Agent " + id + " stepping:");
+//        System.out.println("    x="+agentLocation.x+", y="+agentLocation.y);
 
         FestivalNoUI hb = (FestivalNoUI) state;
 
@@ -93,11 +129,11 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             // Calculate the next move towards the goal.
 
             // Difference between where I am and where I want to be
-            // dx and dy become my next step
+            // dx and dy are my desired vector of travel
             double dx = desiredLocation.x - location.x;
             double dy = desiredLocation.y - location.y;
 
-            // Normalise vector **
+            // Normalise the vector
             double normalisation = Math.pow(dx, 2.0) + Math.pow(dy, 2.0);
             if (normalisation > 0) {
                 normalisation = Math.sqrt(normalisation);
@@ -105,8 +141,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
                 dy /= normalisation;
             }
 
-
-
+            // Discretise
             dx /= DISTANCE_SCALE;
             dy /= DISTANCE_SCALE;
 
@@ -116,67 +151,65 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             dx -= (lastDX / TIMESTEP);
             dy -= (lastDY / TIMESTEP);
 
-
             dx /= ACCELERATION;
             dy /= ACCELERATION;
 
-
+            // Social forces
             double sx = 0.0;
             double sy = 0.0;
+
+            Bag obstacles = environment.getObjectsWithinDistance(this.getLocation(), HORIZON);
+            
             // iterate through other agents, determining social forces
+            for (Object o : obstacles) {
+                Obstacle a = (Obstacle) o;
 
-			Bag obstacles = environment.getObjectsWithinDistance(this.getLocation(), HORIZON);
-			
-            for (Locateable a : obstacles) {
-                if ((a.inEnvironment) && (!a.equals(this))) {
-                    double displacementX = this.getLocation().getX() - a.getLocation().getX();
-                    double displacementY = this.getLocation().getY() - a.getLocation().getY();
+                if (a instanceof FestivalAgent) {
+                    if ((((FestivalAgent) a).inEnvironment) && (!a.equals(this))) {
+                        double displacementX = this.getLocation().getX() - a.getLocation().getX();
+                        double displacementY = this.getLocation().getY() - a.getLocation().getY();
 
-                    displacementX /= DISTANCE_SCALE;
-                    displacementY /= DISTANCE_SCALE;
+                        displacementX /= DISTANCE_SCALE;
+                        displacementY /= DISTANCE_SCALE;
 
-                    double displacement = Math.sqrt(Math.pow(displacementX, 2.0) + Math.pow(displacementY, 2.0));
+                        double displacement = Math.sqrt(Math.pow(displacementX, 2.0) + Math.pow(displacementY, 2.0));
 
-                    double forceX = (AP * displacementX / displacement) * Math.exp(-displacement / BP);
-                    forceX += (AA * displacementX / displacement) * Math.exp(-displacement / BA);
+                        double forceX = (AP * displacementX / displacement) * Math.exp(-displacement / BP);
+                        forceX += (AA * displacementX / displacement) * Math.exp(-displacement / BA);
 
-                    double forceY = (AP * displacementY / displacement) * Math.exp(-displacement / BP);
-                    forceY += (AA * displacementY / displacement) * Math.exp(-displacement / BA);
+                        double forceY = (AP * displacementY / displacement) * Math.exp(-displacement / BP);
+                        forceY += (AA * displacementY / displacement) * Math.exp(-displacement / BA);
 
-                    sx += forceX;
-                    sy += forceY;
+                        sx += forceX;
+                        sy += forceY;
+                    }
                 }
             }
-
 
             // make a step dependent on the force
             dx += sx;
             dy += sy;
 
-
             // add noise
-            dx += (Math.random() * 2.0 - 1.0) * 10.0;
-            dy += (Math.random() * 2.0 - 1.0) * 10.0;
+            dx += (Math.random() * 2.0 - 1.0) * NOISE;
+            dy += (Math.random() * 2.0 - 1.0) * NOISE;
 
-
+            // How much this time step
             dx *= TIMESTEP;
             dy *= TIMESTEP;
-
-
-
-
-            //System.out.println(dx + ", " + dy);
 
             // Actually move the agent, if it's a position it can occupy, otherwise stay still.
             if (hb.acceptablePosition(this, new Double2D(location.x + dx, location.y + dy))) {
                 agentLocation = new Double2D(location.x + dx, location.y + dy);
                 hb.environment.setObjectLocation(this, agentLocation);
+
             }
 
+            // Remember
             lastDX = dx;
             lastDY = dy;
         } else {
-            // Not yet in the environment - try to put me in it
+            // If not yet in the environment (because the entrance is blocked), try to put me in it
             if (hb.acceptablePosition(this, location)) {
                 environment.setObjectLocation(this, location);
                 inEnvironment = true;
@@ -184,9 +217,13 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         }
 
 
+        // Update the agent's colour
+        paint = agentColor;
+
+
     }
 
-// application specific variables
+    // application specific variables
     public static final int AGENT = 0;
     protected int agentState;
 
