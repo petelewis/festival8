@@ -45,27 +45,33 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private static final double DESIRED_VELOCITY = 80.0;
     private static final double NOISE = 30.0;
     private static final double ANGLE_MAX = Math.PI / 4;
-    private static final double STAGE_RADIUS = 3.0;
+    private static final double STAGE_RADIUS = 4.5;
+    private static final double REACHED_GOAL_RADIUS = 15.0;
     private double lastDX = 0.0;
     private double lastDY = 0.0;
     //private double threshold;
 
     // The agent's properties / state
     private int intention;
-    private int preferredStage;
+    public int preferredStage;
     private Double2D currentGoal;
     private Double2D startLocation;
     private boolean measuring;
-    private int timeMeasured;
+    public int timeMeasured;
     public static double HORIZON = 42.0;
+    public double lastTimeMeasured;
     private Happiness happiness;
-
     // The agent's sigma stuff
     private ArrayList<Sigma> sigmas = new ArrayList<Sigma>();
-    private Sigma currentSigma;
-    private static final int POPULATION_SIZE = 20;
-    private static final double MIN_SIGMA = -5.0;
-    private static final double MAX_SIGMA = 5.0;
+    public Sigma currentSigma;
+    private static final int POPULATION_SIZE = 10;
+
+    //private static final double MIN_SIGMA = -5.0;
+    //private static final double MAX_SIGMA = 5.0;
+    //private static final double MIN_SIGMA = -2.0;
+    //private static final double MAX_SIGMA = 3.0;
+    private static final double MU_SIGMA = 1.0;
+    private static final double SIGMA_SIGMA = 1.5;
     Double2D desiredLocation = null;
     Double2D suggestedLocation = null;
     int steps = 0;
@@ -84,7 +90,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         measuring = false;
 
         this.agentLocation = location;
-        
+
         this.happiness = new Happiness();
 
         this.setState(state);
@@ -107,29 +113,29 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             agentColor = new Color(0, 0, 0);
             preferredStage = 2;
         }
-        
-		if (!agents.stagePreferencesSwitched) {
-			setNewIntention(preferredStage);
-		} else {
-			if (preferredStage == 1) {
-				setNewIntention(2);
-			}
-			if (preferredStage == 2) {
-				setNewIntention(1);
-			}
-		}
+
+        if (!agents.stagePreferencesSwitched) {
+            setNewIntention(preferredStage);
+        } else {
+            if (preferredStage == 1) {
+                setNewIntention(2);
+            }
+            if (preferredStage == 2) {
+                setNewIntention(1);
+            }
+        }
 
 
         // Sigma stuff
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            sigmas.add(new Sigma(MIN_SIGMA, MAX_SIGMA));
+            sigmas.add(new Sigma(MU_SIGMA, SIGMA_SIGMA));
         }
 
         // Set the initial goal
         setNewGoal(getStageLocation(intention));
 
 
-        System.out.println("Agent " + id + ": intention = " + intention + ", goal = " + getCurrentGoal().x + ", " + getCurrentGoal().y);
+    //System.out.println("Agent " + id + ": intention = " + intention + ", goal = " + getCurrentGoal().x + ", " + getCurrentGoal().y);
     }
 
     public Double2D getLocation() {
@@ -165,19 +171,21 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     public void startMeasuring() {
         if (id >= 10) {
 
-            // Record the location of where we were when we started measuring
-            startLocation = agentLocation;
-            timeMeasured = 0;
-            measuring = true;
+            if (!measuring) {
+                // Record the location of where we were when we started measuring
+                //startLocation = agentLocation;
+                timeMeasured = 0;
+                measuring = true;
 
-            if (preferredStage == 1) {
-                agentColor = new Color(255, 255, 255);
-            } else {
-                agentColor = new Color(0, 0, 0);
-            }
+                if (preferredStage == 1) {
+                    agentColor = new Color(255, 255, 255);
+                } else {
+                    agentColor = new Color(0, 0, 0);
+                }
 
-            if (id == 10) {
-                System.out.println("Starting measuring... ");
+                if (id == 10) {
+                    //System.out.println("Starting measuring... ");
+                }
             }
         }
     }
@@ -191,8 +199,10 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             // Fill in the current individual's payoff information
             currentSigma.setFitness(-timeMeasured);
 
+            lastTimeMeasured = timeMeasured;
+
             if (id == 10) {
-                System.out.println("Completed measuring.  Sigma was " + currentSigma.getSigma() + ".  Time taken = " + timeMeasured);
+                //System.out.println("Completed measuring.  Sigma was " + currentSigma.getSigma() + ".  Time taken = " + timeMeasured);
             }
 
 
@@ -303,20 +313,20 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         if (inEnvironment) {
             // Get the agent's goal location
             //suggestedLocation = hb.kMeansEngine.getGoalPosition(intID);
-            
+
             desiredLocation = getCurrentGoal();
 
             // update hunger/thirst/bladder
-            if(id >= 10){
-				happiness.updateStep();
-				Double2D newGoal = happiness.getNewGoal(preferredStage);
-				
-				
-				if(desiredLocation != newGoal){
-					setNewGoal(newGoal);
-					desiredLocation = newGoal;
-				}
-			}
+            if (id >= 10) {
+                happiness.updateStep();
+                Double2D newGoal = happiness.getNewGoal(preferredStage);
+
+
+                if (desiredLocation != newGoal) {
+                    setNewGoal(newGoal);
+                    desiredLocation = newGoal;
+                }
+            }
 
 
             // Calculate the next move towards the goal.
@@ -400,7 +410,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             double stageX, stageY, stageDisplacement, stageForceX, stageForceY;
 
             // Start high!
-            double goalStageDisplacement = 1000;
+            double goalDisplacement = 1000;
 
             // Don't repel band members
             if (id >= 10) {
@@ -412,9 +422,6 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
                     stageY /= DISTANCE_SCALE;
 
                     stageDisplacement = Math.sqrt(Math.pow(stageX, 2.0) + Math.pow(stageY, 2.0));
-                    if (intention == i) {
-                        goalStageDisplacement = stageDisplacement;
-                    }
 
                     stageForceX = (100 * AP * stageX / stageDisplacement) * Math.exp(-Math.abs(stageDisplacement - STAGE_RADIUS) / BP);
                     stageForceY = (100 * AP * stageY / stageDisplacement) * Math.exp(-Math.abs(stageDisplacement - STAGE_RADIUS) / BP);
@@ -442,7 +449,15 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             }
 
             // Check to see if we've reached our goal.
-            if ((goalStageDisplacement < 10) && measuring) {
+            double gsdx = getCurrentGoal().x - agentLocation.x;
+            double gsdy = getCurrentGoal().y - agentLocation.y;
+            
+            gsdx /= DISTANCE_SCALE;
+            gsdy /= DISTANCE_SCALE;
+
+            goalDisplacement = Math.sqrt(Math.pow(gsdx, 2.0) + Math.pow(gsdy, 2.0));
+            
+            if ((goalDisplacement < REACHED_GOAL_RADIUS) && measuring) {
                 completeMeasuring();
                 happiness.reachedGoal(getCurrentGoal());
             }
