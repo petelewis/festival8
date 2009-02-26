@@ -64,7 +64,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
      */
     public FestivalAgent(final Double2D location, final int state, int i, Continuous2D env, AgentPopulation a) {
         super(FestivalNoUI.DIAMETER);
-        //System.out.println("New agent created with id " + i);
+        System.out.println("New agent created with id " + i);
 
 
         this.agentLocation = location;
@@ -76,7 +76,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         id = i;
 
         // Randomise threshold
-        threshold = gaussian_rand(0.0, 0.5);
+        threshold = gaussian_rand(0.0, 3);
 
         // Half the agents prefer each stage
         if (Math.random() < 0.5) {
@@ -191,9 +191,11 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
                 dx /= normalisation;
                 dy /= normalisation;
                 //Calculate maximum divergence angle
-                double omega = ANGLE_MAX * Math.tanh(threshold);
+                //double omega = ANGLE_MAX * Math.tanh(threshold);
+                double omega = ANGLE_MAX * Math.tanh(threshold/10);
                 //Adjust according to distance
-                omega *= Math.pow(normalisation / (normalisation + 1), 10);
+                //omega *= Math.pow(normalisation / (normalisation + 1), 10);
+                omega *= normalisation / (normalisation + 150);
                 double tempx = dx * Math.cos(omega) - dy * Math.sin(omega);
                 double tempy = dx * Math.sin(omega) + dy * Math.cos(omega);
                 dx = tempx;
