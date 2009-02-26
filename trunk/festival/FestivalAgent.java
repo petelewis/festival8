@@ -42,10 +42,13 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private static final double DISTANCE_SCALE = 10.0;
     private static final double TIMESTEP = 0.1;
     private static final double ACCELERATION = 3.0;
-    private static final double DESIRED_VELOCITY = 800.0;
-    private static final double NOISE = 20.0;
+    private static final double DESIRED_VELOCITY = 80.0;
+    private static final double NOISE = 30.0;
+    private static final double ANGLE_MAX = Math.PI / 4;
+    private static final double STAGE_RADIUS = 3.0;
     private double lastDX = 0.0;
     private double lastDY = 0.0;
+    private double threshold;
 
     // The agent's properties / state
     private int preferredStage;
@@ -72,6 +75,9 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
         id = i;
 
+        // Randomise threshold
+        threshold = gaussian_rand(0.0, 0.5);
+
         // Half the agents prefer each stage
         if (Math.random() < 0.5) {
             preferredStage = 1;
@@ -95,24 +101,51 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
      * @return
      */
     public Double2D getGoalPosition() {
-        if (!stageSwitched) {
-            if (preferredStage == 1) {
-                agentColor = new Color(255, 255, 255);
-                return new Double2D(800, 400);
-
+        // If the agent is a festival goer
+        if (id >= 10) {
+            if (!stageSwitched) {
+                if (preferredStage == 1) {
+                    agentColor = new Color(255, 255, 255);
+                    return getStageLocation(1);
+                } else {
+                    agentColor = new Color(0, 0, 0);
+                    return getStageLocation(2);
+                }
             } else {
-                agentColor = new Color(0, 0, 0);
-                return new Double2D(10, 400);
+                if (preferredStage == 1) {
+                    agentColor = new Color(0, 0, 0);
+                    return getStageLocation(2);
+
+                } else {
+                    agentColor = new Color(255, 255, 255);
+                    return getStageLocation(1);
+                }
             }
         } else {
-            if (preferredStage == 2) {
-                agentColor = new Color(255, 255, 255);
-                return new Double2D(800, 400);
-
+            // The agent is fixed
+            if (id < 5) {
+                agentColor = new Color(0, 0, 255);
+                return getStageLocation(1);
+            } else if (id >= 5) {
+                agentColor = new Color(0, 0, 255);
+                return getStageLocation(2);
             } else {
-                agentColor = new Color(0, 0, 0);
-                return new Double2D(10, 400);
+                // This should never happen
+                System.out.println("Uncategorised agen!");
+                return new Double2D(500, 500);
             }
+
+        }
+    }
+
+    public Double2D getStageLocation(int x) {
+        if (x == 1) {
+            return new Double2D(790, 400);
+        } else if (x == 2) {
+            return new Double2D(10, 400);
+        } else {
+            System.out.println("Error");
+            return new Double2D(500, 500);
         }
     }
 
@@ -152,15 +185,22 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
 
             // Normalise the vector
             double normalisation = Math.pow(dx, 2.0) + Math.pow(dy, 2.0);
+
             if (normalisation > 0) {
                 normalisation = Math.sqrt(normalisation);
                 dx /= normalisation;
                 dy /= normalisation;
+                //Calculate maximum divergence angle
+                double omega = ANGLE_MAX * Math.tanh(threshold);
+                //Adjust according to distance
+                omega *= Math.pow(normalisation / (normalisation + 1), 10);
+                double tempx = dx * Math.cos(omega) - dy * Math.sin(omega);
+                double tempy = dx * Math.sin(omega) + dy * Math.cos(omega);
+                dx = tempx;
+                dy = tempy;
             }
 
-            // Discretise
-            dx /= DISTANCE_SCALE;
-            dy /= DISTANCE_SCALE;
+            // Discretise;
 
             dx *= DESIRED_VELOCITY;
             dy *= DESIRED_VELOCITY;
@@ -211,6 +251,29 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             dx += (Math.random() * 2.0 - 1.0) * NOISE;
             dy += (Math.random() * 2.0 - 1.0) * NOISE;
 
+            // Repel from stage barriers using getStageLocation(1) etc...
+            double stageX, stageY, stageDisplacement, stageForceX, stageForceY;
+
+            // Don't repel band members
+            if (id >= 10) {
+                for (int i = 1; i < 3; i++) {
+                    stageX = agentLocation.x - getStageLocation(i).x;
+                    stageY = agentLocation.y - getStageLocation(i).y;
+
+                    stageX /= DISTANCE_SCALE;
+                    stageY /= DISTANCE_SCALE;
+
+                    stageDisplacement = Math.sqrt(Math.pow(stageX, 2.0) + Math.pow(stageY, 2.0));
+
+                    stageForceX = (100 * AP * stageX / stageDisplacement) * Math.exp(-Math.abs(stageDisplacement - STAGE_RADIUS) / BP);
+                    stageForceY = (100 * AP * stageY / stageDisplacement) * Math.exp(-Math.abs(stageDisplacement - STAGE_RADIUS) / BP);
+
+                    dx += stageForceX;
+                    dy += stageForceY;
+                }
+            }
+
+
             // How much this time step
             dx *= TIMESTEP;
             dy *= TIMESTEP;
@@ -251,5 +314,20 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     void setState(final int agentState) {
         // set the oval's color
         paint = agentColor;
+    }
+
+    // Random number generators
+    private static double uniform_rand(double min, double max) {
+        return min + (max - min) * (Math.random());
+    }
+
+    private static double gaussian_rand(double mu, double sigma) {
+        double p, p1, p2;
+        do {
+            p1 = uniform_rand(-1.0, 1.0);
+            p2 = uniform_rand(-1.0, 1.0);
+            p = p1 * p1 + p2 * p2;
+        } while (p >= 1.0);
+        return mu + sigma * p1 * Math.sqrt(-2.0 * Math.log(p) / p);
     }
 }
