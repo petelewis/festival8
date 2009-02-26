@@ -63,13 +63,11 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private ArrayList<Sigma> sigmas = new ArrayList<Sigma>();
     private Sigma currentSigma;
     private static final int POPULATION_SIZE = 20;
-    private static final double MIN_SIGMA = -0.5;
-    private static final double MAX_SIGMA = 0.5;
-
+    private static final double MIN_SIGMA = -5.0;
+    private static final double MAX_SIGMA = 5.0;
     Double2D desiredLocation = null;
     Double2D suggestedLocation = null;
     int steps = 0;
-
 
     /**
      * The agent's constuctor
@@ -202,93 +200,114 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     }
 
     public void startMeasuring() {
-        // Record the location of where we were when we started measuring
-        startLocation = agentLocation;
-        timeMeasured = 0;
-        measuring = true;
+        if (id >= 10) {
+
+            // Record the location of where we were when we started measuring
+            startLocation = agentLocation;
+            timeMeasured = 0;
+            measuring = true;
+
+            if (preferredStage == 1) {
+                agentColor = new Color(255, 255, 255);
+            } else {
+                agentColor = new Color(0, 0, 0);
+            }
+
+            if (id == 10) {
+                System.out.println("Starting measuring... ");
+            }
+        }
     }
 
     public void completeMeasuring() {
-        measuring = false;
+        if (id >= 10) {
+            measuring = false;
 
-        // Fill in the current individual's payoff information
-        currentSigma.setFitness(-timeMeasured);
+            agentColor = new Color(255, 0, 0);
 
-        // Only do the evostep if the whole population's fitness information is full
-        boolean doGAstep = true;
-        for (Sigma s : sigmas) {
-            if (!s.tested) {
-                doGAstep = false;
+            // Fill in the current individual's payoff information
+            currentSigma.setFitness(-timeMeasured);
+
+            if (id == 10) {
+                System.out.println("Completed measuring.  Sigma was " + currentSigma.getSigma() + ".  Time taken = " + timeMeasured);
             }
+
+
+            // Only do the evostep if the whole population's fitness information is full
+            boolean doGAstep = true;
+            for (Sigma s : sigmas) {
+                if (!s.tested) {
+                    doGAstep = false;
+                }
+            }
+
+            if (doGAstep) {
+                // Then do some tournament selection...
+
+                // Select four at random from the population
+                Sigma s1 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
+                Sigma s2 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
+                Sigma s3 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
+                Sigma s4 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
+
+
+                // Pointers for convenience
+                Sigma champ1;
+                Sigma champ2;
+                Sigma toBeReplaced;
+
+                // Simple probabilistic tournament selection
+                boolean goWithBest = true;
+
+                // The probabilistic bit
+                // This bit is needed to stop premature (inefficient) convergence.
+                if (Math.random() < 0.1) {
+                    goWithBest = false;
+                }
+
+
+                if ((s1.getFitness() <= s2.getFitness()) && (goWithBest)) {
+                    champ1 = s2;
+                } else {
+                    champ1 = s1;
+                }
+
+                if ((s3.getFitness() <= s4.getFitness()) && (goWithBest)) {
+                    champ2 = s4;
+                } else {
+                    champ2 = s3;
+                }
+
+
+                // Find who to replace
+                toBeReplaced = s1;
+
+
+                // In tests, the absence of this probabilistic bit made no difference.
+                // See results/simcoma/mar08/elitism
+                //if (Math.random() < 0.1)
+                //    goWithBest = false;
+
+                if ((s2.getFitness() <= toBeReplaced.getFitness()) && (goWithBest)) {
+                    toBeReplaced = s2;
+                }
+
+                if ((s3.getFitness() <= toBeReplaced.getFitness()) && (goWithBest)) {
+                    toBeReplaced = s3;
+                }
+
+                if ((s4.getFitness() <= toBeReplaced.getFitness()) && (goWithBest)) {
+                    toBeReplaced = s4;
+                }
+
+
+                // Do the replacement, by crossover and mutation, from our two champions.
+                sigmas.set(sigmas.indexOf(toBeReplaced), new Sigma(champ1, champ2));
+            }
+
+        //System.out.println(thisRoundPayoff);
+
         }
-
-        if (doGAstep) {
-            // Then do some tournament selection...
-
-            // Select four at random from the population
-            Sigma s1 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
-            Sigma s2 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
-            Sigma s3 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
-            Sigma s4 = sigmas.get((int) (Math.random() * (double) sigmas.size()));
-
-
-            // Pointers for convenience
-            Sigma champ1;
-            Sigma champ2;
-            Sigma toBeReplaced;
-
-            // Simple probabilistic tournament selection
-            boolean goWithBest = true;
-
-            // The probabilistic bit
-            // This bit is needed to stop premature (inefficient) convergence.
-            if (Math.random() < 0.1) {
-                goWithBest = false;
-            }
-
-
-            if ((s1.getFitness() <= s2.getFitness()) && (goWithBest)) {
-                champ1 = s2;
-            } else {
-                champ1 = s1;
-            }
-
-            if ((s3.getFitness() <= s4.getFitness()) && (goWithBest)) {
-                champ2 = s4;
-            } else {
-                champ2 = s3;
-            }
-
-
-            // Find who to replace
-            toBeReplaced = s1;
-
-
-            // In tests, the absence of this probabilistic bit made no difference.
-            // See results/simcoma/mar08/elitism
-            //if (Math.random() < 0.1)
-            //    goWithBest = false;
-
-            if ((s2.getFitness() <= toBeReplaced.getFitness()) && (goWithBest)) {
-                toBeReplaced = s2;
-            }
-
-            if ((s3.getFitness() <= toBeReplaced.getFitness()) && (goWithBest)) {
-                toBeReplaced = s3;
-            }
-
-            if ((s4.getFitness() <= toBeReplaced.getFitness()) && (goWithBest)) {
-                toBeReplaced = s4;
-            }
-
-
-            // Do the replacement, by crossover and mutation, from our two champions.
-            sigmas.set(sigmas.indexOf(toBeReplaced), new Sigma(champ1, champ2));
-        }
-
-    //System.out.println(thisRoundPayoff);
-
-
 
 
 
@@ -340,7 +359,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
                 dy /= normalisation;
                 //Calculate maximum divergence angle
                 //double omega = ANGLE_MAX * Math.tanh(threshold);
-                double omega = ANGLE_MAX * Math.tanh(currentSigma.getSigma() / 10.0);
+                double omega = ANGLE_MAX * Math.tanh(currentSigma.getSigma() / 1.0);
                 //Adjust according to distance
                 //omega *= Math.pow(normalisation / (normalisation + 1), 10);
                 omega *= normalisation / (normalisation + 150);
