@@ -21,6 +21,7 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 10;
     private static final int MAX_NUMBER_OF_AGENTS = 400;
     private static int timeBetweenAgents = 0;
+    public boolean stagePreferencesSwitched = false;
 
     // Count the number of agents generated, to give agents an ID number
     private static int count = 0;
@@ -55,6 +56,24 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
                 }
             }
         }
+
+
+        // switch stages
+        //if (Math.random() < 0.00001) {
+        if (schedule.getTime() % 3000 == 0) {
+            // Switch stages for all agents.
+            stagePreferencesSwitched = !stagePreferencesSwitched;
+            for (FestivalAgent a : this) {
+                if (a.id > 9) {
+                    if (a.getCurrentIntention() == 1) {
+                        a.setNewIntention(2);
+                    } else if (a.getCurrentIntention() == 2) {
+                        a.setNewIntention(1);
+                    }
+                }
+            }
+        }
+
     }
 
     /**
