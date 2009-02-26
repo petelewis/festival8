@@ -36,13 +36,13 @@ public class Happiness {
     public double drinkState;
     
     public Happiness(){
-    	toiletThresh = 50 - 50 * Math.random();
-    	foodThresh =  50 * (Math.random() -0.5);
-    	drinkThresh =  50 * (Math.random() -0.5);
+    	toiletThresh = 500 - 50 * Math.random();
+    	foodThresh =  500 * (Math.random() -0.5);
+    	drinkThresh =  500 * (Math.random() -0.5);
     	
-    	toiletState = 50 * Math.random();
-    	foodState = 50 + 50 * Math.random();
-    	drinkState = 50 + 50 * Math.random();
+    	toiletState = 500 * Math.random();
+    	foodState = 500 + 50 * Math.random();
+    	drinkState = 500 + 50 * Math.random();
     	
     	
     }
@@ -58,6 +58,17 @@ public class Happiness {
     		return STAGES.get(preferredStage - 1 );
     	}
     }
+    
+    public void reachedGoal(Double2D goal){
+    	if(goal == TOILET){
+    		toiletState = 0;
+    	} else if(goal == BURGERKING){
+    		foodState = 500;
+    	} else if(goal == BAR){
+    		drinkState = 500;
+    	}
+    }
+    	
     
     public void updateStep(){
     	foodState -= Math.random();

@@ -58,6 +58,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
     private boolean measuring;
     private int timeMeasured;
     public static double HORIZON = 42.0;
+    private Happiness happiness;
 
     // The agent's sigma stuff
     private ArrayList<Sigma> sigmas = new ArrayList<Sigma>();
@@ -83,6 +84,8 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         measuring = false;
 
         this.agentLocation = location;
+        
+        this.happiness = new Happiness();
 
         this.setState(state);
         environment = env;
@@ -300,7 +303,20 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         if (inEnvironment) {
             // Get the agent's goal location
             //suggestedLocation = hb.kMeansEngine.getGoalPosition(intID);
+            
             desiredLocation = getCurrentGoal();
+
+            // update hunger/thirst/bladder
+            if(id >= 10){
+				happiness.updateStep();
+				Double2D newGoal = happiness.getNewGoal(preferredStage);
+				
+				
+				if(desiredLocation != newGoal){
+					setNewGoal(newGoal);
+					desiredLocation = newGoal;
+				}
+			}
 
 
             // Calculate the next move towards the goal.
@@ -428,6 +444,7 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             // Check to see if we've reached our goal.
             if ((goalStageDisplacement < 10) && measuring) {
                 completeMeasuring();
+                happiness.reachedGoal(getCurrentGoal());
             }
 
 
