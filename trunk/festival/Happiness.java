@@ -35,6 +35,18 @@ public class Happiness {
     // toilet state
     public double drinkState;
     
+    public Happiness(){
+    	toiletThresh = 50 - 50 * Math.random();
+    	foodThresh =  50 * (Math.random() -0.5);
+    	drinkThresh =  50 * (Math.random() -0.5);
+    	
+    	toiletState = 50 * Math.random();
+    	foodState = 50 + 50 * Math.random();
+    	drinkState = 50 + 50 * Math.random();
+    	
+    	
+    }
+    
     public Double2D getNewGoal(int preferredStage){
     	if(toiletState > toiletThresh){
     		return TOILET;
