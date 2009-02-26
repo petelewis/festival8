@@ -62,6 +62,7 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
         // switch stages
         //if (Math.random() < 0.00001) {
         if (schedule.getTime() % 3000 == 0) {
+        	Happiness.exchangeStages();
             // Switch stages for all agents.
             stagePreferencesSwitched = !stagePreferencesSwitched;
             for (FestivalAgent a : this) {
