@@ -18,8 +18,8 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     private FestivalNoUI sim;
     private static final double STARTX = 300.0;
     private static final double STARTY = 10.0;
-    private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 2;
-    private static final int MAX_NUMBER_OF_AGENTS = 700;
+    private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 10;
+    private static final int MAX_NUMBER_OF_AGENTS = 400;
     private static int timeBetweenAgents = 0;
 
     // Count the number of agents generated, to give agents an ID number
@@ -37,11 +37,22 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     }
 
     public void step(SimState state) {
-        if (count < MAX_NUMBER_OF_AGENTS) {
-            timeBetweenAgents++;
-            if ((Math.random() < 0.05) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
-                generateNew();
-                timeBetweenAgents = 0;
+        timeBetweenAgents++;
+        if ((count < MAX_NUMBER_OF_AGENTS) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
+            if (Math.random() < 0.05) {
+                if (count < 10) {
+                    generateNew();
+                    if (count == 10) {
+                        timeBetweenAgents = -500;
+                    } else {
+                        timeBetweenAgents = 0;
+                    }
+                } else {
+                    if (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS) {
+                        generateNew();
+                        timeBetweenAgents = 0;
+                    }
+                }
             }
         }
     }
