@@ -104,17 +104,18 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
             agentColor = new Color(0, 0, 0);
             preferredStage = 2;
         }
+        
+		if (!agents.stagePreferencesSwitched) {
+			setNewIntention(preferredStage);
+		} else {
+			if (preferredStage == 1) {
+				setNewIntention(2);
+			}
+			if (preferredStage == 2) {
+				setNewIntention(1);
+			}
+		}
 
-        if (!agents.stagePreferencesSwitched) {
-            setNewIntention(preferredStage);
-        } else {
-            if (preferredStage == 1) {
-                setNewIntention(2);
-            }
-            if (preferredStage == 2) {
-                setNewIntention(1);
-            }
-        }
 
         // Sigma stuff
         for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -136,47 +137,6 @@ public class FestivalAgent extends sim.portrayal.simple.OvalPortrayal2D implemen
         return currentGoal;
     }
 
-//    /**
-//     * Calculate the agent's goal position
-//     * @return
-//     */
-//    public Double2D getGoalPosition() {
-//        // If the agent is a festival goer
-//        if (id >= 10) {
-//            if (!stageSwitched) {
-//                if (preferredStage == 1) {
-//                    agentColor = new Color(255, 255, 255);
-//                    return getStageLocation(1);
-//                } else {
-//                    agentColor = new Color(0, 0, 0);
-//                    return getStageLocation(2);
-//                }
-//            } else {
-//                if (preferredStage == 1) {
-//                    agentColor = new Color(0, 0, 0);
-//                    return getStageLocation(2);
-//
-//                } else {
-//                    agentColor = new Color(255, 255, 255);
-//                    return getStageLocation(1);
-//                }
-//            }
-//        } else {
-//            // The agent is fixed
-//            if (id < 5) {
-//                agentColor = new Color(0, 0, 255);
-//                return getStageLocation(1);
-//            } else if (id >= 5) {
-//                agentColor = new Color(0, 0, 255);
-//                return getStageLocation(2);
-//            } else {
-//                // This should never happen
-//                System.out.println("Uncategorised agen!");
-//                return new Double2D(500, 500);
-//            }
-//
-//        }
-//    }
     public int getCurrentIntention() {
         return intention;
     }
