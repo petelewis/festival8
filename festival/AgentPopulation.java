@@ -16,11 +16,10 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     private Continuous2D environment;
     private Schedule schedule;
     private FestivalNoUI sim;
-    
     private static final double STARTX = 300.0;
     private static final double STARTY = 10.0;
-
     private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 2;
+    private static final int MAX_NUMBER_OF_AGENTS = 700;
     private static int timeBetweenAgents = 0;
 
     // Count the number of agents generated, to give agents an ID number
@@ -38,16 +37,13 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     }
 
     public void step(SimState state) {
-
-        timeBetweenAgents++;
-
-        if ((Math.random() < 0.05) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
-            generateNew();
-            timeBetweenAgents = 0;
+        if (count < MAX_NUMBER_OF_AGENTS) {
+            timeBetweenAgents++;
+            if ((Math.random() < 0.05) && (timeBetweenAgents > MIN_TIME_BETWEEN_NEW_AGENTS)) {
+                generateNew();
+                timeBetweenAgents = 0;
+            }
         }
-
-
-            
     }
 
     /**
@@ -78,5 +74,4 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
         // And finally add it to the population
         add(agent);
     }
-    
 }

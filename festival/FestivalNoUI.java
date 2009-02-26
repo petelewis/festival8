@@ -80,6 +80,7 @@ public class FestivalNoUI extends SimState {
 
         environment = new Continuous2D(8.0, XMAX - XMIN, YMAX - YMIN);
 
+
         agentPopulation = new AgentPopulation(environment, schedule, this);
 
         

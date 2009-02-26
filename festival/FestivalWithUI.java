@@ -56,6 +56,7 @@ public class FestivalWithUI extends GUIState {
         display.reset();
         display.setBackdrop(Color.green);
 
+
         // redraw the display
         display.repaint();
     }
