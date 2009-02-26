@@ -17,14 +17,15 @@ public class Sigma {
     
     // The mutation rate -  need to calibrate this
     //private static final double mu = 0.01;
-    private static final double mu = 0.1;
+    private static final double mu = 0.5;
     
     
     
     /** Creates a new instance of Sigma */
-    public Sigma(double min, double max) {
+    public Sigma(double mu, double sigma) {
         // Randomly within the constraints. Min is assumed to be zero.
-        p = (Math.random() * (double)(max - min)) + (double)min;
+        //p = (Math.random() * (double)(max - min)) + (double)min;
+        p = gaussian_rand(mu, sigma);
         tested = false;
     }
     

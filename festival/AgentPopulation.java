@@ -19,8 +19,8 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     private static final double STARTX = 300.0;
     private static final double STARTY = 10.0;
     private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 10;
-    //private static final int MAX_NUMBER_OF_AGENTS = 400;
-    private static final int MAX_NUMBER_OF_AGENTS = 11;
+    private static final int MAX_NUMBER_OF_AGENTS = 200;
+    //private static final int MAX_NUMBER_OF_AGENTS = 11;
     private static int timeBetweenAgents = 0;
     public boolean stagePreferencesSwitched = false;
 
@@ -61,20 +61,63 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
 
         // switch stages
         //if (Math.random() < 0.00001) {
-        if (schedule.getTime() % 3000 == 0) {
-        	Happiness.exchangeStages();
-            // Switch stages for all agents.
-            stagePreferencesSwitched = !stagePreferencesSwitched;
-            for (FestivalAgent a : this) {
-                if (a.id > 9) {
-                    if (a.getCurrentIntention() == 1) {
-                        a.setNewIntention(2);
-                    } else if (a.getCurrentIntention() == 2) {
-                        a.setNewIntention(1);
-                    }
-                }
-            }
-        }
+
+        double mean1 = 0.0;
+        double mean2 = 0.0;
+
+        double var1 = 0.0;
+        double var2 = 0.0;
+
+        int count1 = 0;
+        int count2 = 0;
+
+        double meanTime = 0.0;
+
+
+//        if (schedule.getTime() % 1000 == 0) {
+//        	Happiness.exchangeStages();
+//            // Switch stages for all agents.
+//            stagePreferencesSwitched = !stagePreferencesSwitched;
+//            for (FestivalAgent a : this) {
+//                if (a.id > 9) {
+//                    if (a.getCurrentIntention() == 1) {
+//                        a.setNewIntention(2);
+//                    } else if (a.getCurrentIntention() == 2) {
+//                        a.setNewIntention(1);
+//                    }
+//
+//                    if (a.preferredStage == 1) {
+//                        mean1 += a.currentSigma.getSigma();
+//                        count1++;
+//                        meanTime += a.timeMeasured;
+//                    } else if (a.preferredStage == 2) {
+//                        mean2 += a.currentSigma.getSigma();
+//                        count2++;
+//                        meanTime += a.lastTimeMeasured;
+//                    }
+//                }
+//            }
+//
+//            mean1 /= count1;
+//            mean2 /= count2;
+//            meanTime /= (count1 + count2);
+//
+//            for (FestivalAgent a : this) {
+//                if (a.id > 9) {
+//                    if (a.preferredStage == 1) {
+//                        var1 += Math.pow(a.currentSigma.getSigma() - mean1, 2);
+//                    } else if (a.preferredStage == 2) {
+//                        var2 += Math.pow(a.currentSigma.getSigma() - mean2, 2);
+//                    }
+//                }
+//            }
+//
+//            var1 /= count1;
+//            var2 /= count2;
+//
+//            System.out.println(mean1 + " " + var1 + " " + mean2 + " " + var2 + " " + meanTime);
+//
+//        }
 
     }
 

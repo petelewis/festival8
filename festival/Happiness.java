@@ -13,9 +13,9 @@ public class Happiness {
 	
 	// positions
 	public static List<Double2D> STAGES = setupStages();
-	public static Double2D TOILET = new Double2D(790,100);
-	public static Double2D BAR = new Double2D(400, 400);
-	public static Double2D BURGERKING = new Double2D(10,100);
+	public static Double2D TOILET = new Double2D(790,10);
+	public static Double2D BAR = new Double2D(400, 750);
+	public static Double2D BURGERKING = new Double2D(10,10);
 		
     // toilet threshold
     public double toiletThresh;
@@ -71,9 +71,9 @@ public class Happiness {
     	
     
     public void updateStep(){
-    	foodState -= Math.random();
-    	drinkState -= Math.random();
-    	toiletState += Math.random();
+    	foodState -= Math.random()*0.1;
+    	drinkState -= Math.random()*0.1;
+    	toiletState += Math.random()*0.1;
     	
     }
     
