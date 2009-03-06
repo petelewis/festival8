@@ -74,50 +74,50 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
         double meanTime = 0.0;
 
 
-//        if (schedule.getTime() % 1000 == 0) {
-//        	Happiness.exchangeStages();
-//            // Switch stages for all agents.
-//            stagePreferencesSwitched = !stagePreferencesSwitched;
-//            for (FestivalAgent a : this) {
-//                if (a.id > 9) {
-//                    if (a.getCurrentIntention() == 1) {
-//                        a.setNewIntention(2);
-//                    } else if (a.getCurrentIntention() == 2) {
-//                        a.setNewIntention(1);
-//                    }
-//
-//                    if (a.preferredStage == 1) {
-//                        mean1 += a.currentSigma.getSigma();
-//                        count1++;
-//                        meanTime += a.timeMeasured;
-//                    } else if (a.preferredStage == 2) {
-//                        mean2 += a.currentSigma.getSigma();
-//                        count2++;
-//                        meanTime += a.lastTimeMeasured;
-//                    }
-//                }
-//            }
-//
-//            mean1 /= count1;
-//            mean2 /= count2;
-//            meanTime /= (count1 + count2);
-//
-//            for (FestivalAgent a : this) {
-//                if (a.id > 9) {
-//                    if (a.preferredStage == 1) {
-//                        var1 += Math.pow(a.currentSigma.getSigma() - mean1, 2);
-//                    } else if (a.preferredStage == 2) {
-//                        var2 += Math.pow(a.currentSigma.getSigma() - mean2, 2);
-//                    }
-//                }
-//            }
-//
-//            var1 /= count1;
-//            var2 /= count2;
-//
-//            System.out.println(mean1 + " " + var1 + " " + mean2 + " " + var2 + " " + meanTime);
-//
-//        }
+        if (schedule.getTime() % 1000 == 0) {
+        	Happiness.exchangeStages();
+            // Switch stages for all agents.
+            stagePreferencesSwitched = !stagePreferencesSwitched;
+            for (FestivalAgent a : this) {
+                if (a.id > 9) {
+                    if (a.getCurrentIntention() == 1) {
+                        a.setNewIntention(2);
+                    } else if (a.getCurrentIntention() == 2) {
+                        a.setNewIntention(1);
+                    }
+
+                    if (a.preferredStage == 1) {
+                        mean1 += a.currentSigma.getSigma();
+                        count1++;
+                        meanTime += a.timeMeasured;
+                    } else if (a.preferredStage == 2) {
+                        mean2 += a.currentSigma.getSigma();
+                        count2++;
+                        meanTime += a.lastTimeMeasured;
+                    }
+                }
+            }
+
+            mean1 /= count1;
+            mean2 /= count2;
+            meanTime /= (count1 + count2);
+
+            for (FestivalAgent a : this) {
+                if (a.id > 9) {
+                    if (a.preferredStage == 1) {
+                        var1 += Math.pow(a.currentSigma.getSigma() - mean1, 2);
+                    } else if (a.preferredStage == 2) {
+                        var2 += Math.pow(a.currentSigma.getSigma() - mean2, 2);
+                    }
+                }
+            }
+
+            var1 /= count1;
+            var2 /= count2;
+
+            System.out.println(mean1 + " " + var1 + " " + mean2 + " " + var2 + " " + meanTime);
+
+        }
 
     }
 
