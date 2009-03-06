@@ -19,7 +19,7 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
     private static final double STARTX = 300.0;
     private static final double STARTY = 10.0;
     private static final int MIN_TIME_BETWEEN_NEW_AGENTS = 10;
-    private static final int MAX_NUMBER_OF_AGENTS = 200;
+    private static final int MAX_NUMBER_OF_AGENTS = 1000;
     //private static final int MAX_NUMBER_OF_AGENTS = 11;
     private static int timeBetweenAgents = 0;
     public boolean stagePreferencesSwitched = false;
@@ -75,7 +75,6 @@ public class AgentPopulation extends ArrayDeque<FestivalAgent> implements Steppa
 
 
         if (schedule.getTime() % 1000 == 0) {
-        	Happiness.exchangeStages();
             // Switch stages for all agents.
             stagePreferencesSwitched = !stagePreferencesSwitched;
             for (FestivalAgent a : this) {

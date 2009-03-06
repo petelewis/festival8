@@ -17,7 +17,7 @@ public class Sigma {
     
     // The mutation rate -  need to calibrate this
     //private static final double mu = 0.01;
-    private static final double mu = 0.5;
+    private static final double mu = 0.05;
     
     
     

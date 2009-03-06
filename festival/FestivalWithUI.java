@@ -56,22 +56,7 @@ public class FestivalWithUI extends GUIState {
         display.reset();
         display.setBackdrop(Color.green);
 
-        StagePortrayal overlayStage1 = new StagePortrayal(0, 370, 20, 60, "red");
-        display.attach(overlayStage1, "Stage1");
 
-        StagePortrayal overlayStage2 = new StagePortrayal(780, 370, 20, 60, "red");
-        display.attach(overlayStage2, "Stage2");
-
-        BarPortrayal overlayBar = new BarPortrayal(400, 750, 50, 50, "orange");
-        display.attach(overlayBar, "Bar");
-        FoodstallPortrayal overlayBurgerking = new FoodstallPortrayal(10, 10, 50, 50, "orange");
-        display.attach(overlayBurgerking, "Burgerking");
-
-        ToiletPortrayal overlayToilet = new ToiletPortrayal(790, 10, 70, 70, "yellow");
-        display.attach(overlayToilet, "Toilet");
-
-        display.attach(coPortrayal, "People");
-        
         // redraw the display
         display.repaint();
     }
@@ -81,12 +66,13 @@ public class FestivalWithUI extends GUIState {
         super.init(c);
 
         // make the displayer
-        display = new Display2D(800, 700, this, 1);
+        display = new Display2D(800, 800, this, 1);
 
         displayFrame = display.createFrame();
         displayFrame.setTitle("Festival");
         c.registerFrame(displayFrame);   // register the frame so it appears in the "Display" list
         displayFrame.setVisible(true);
+        display.attach(coPortrayal, "People");
     }
 
     @Override
