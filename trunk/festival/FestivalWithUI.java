@@ -70,6 +70,8 @@ public class FestivalWithUI extends GUIState {
         ToiletPortrayal overlayToilet = new ToiletPortrayal(790, 10, 70, 70, "yellow");
         display.attach(overlayToilet, "Toilet");
 
+        display.attach(coPortrayal, "People");
+        
         // redraw the display
         display.repaint();
     }
@@ -85,7 +87,6 @@ public class FestivalWithUI extends GUIState {
         displayFrame.setTitle("Festival");
         c.registerFrame(displayFrame);   // register the frame so it appears in the "Display" list
         displayFrame.setVisible(true);
-        display.attach(coPortrayal, "People");
     }
 
     @Override
